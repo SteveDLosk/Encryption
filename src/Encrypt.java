@@ -29,17 +29,23 @@ public class Encrypt {
         }
 
         printBytes(bytes);
-        bytes = wrapBytes(bytes, 2, 4);
+        bytes = wrapBytes(bytes, 2, 1, 39);
         System.out.println();
         printBytes(bytes);
         System.out.println();
-        bytes = unwrapBytes(bytes, 2, 4);
+        bytes = unwrapBytes(bytes, 2, 1, 39);
         printBytes(bytes);
     }
     private static ArrayList<Byte> wrapBytes (ArrayList<Byte> bytes, int step, int start) {
         /**
+         *  Default implementation of wrapBytes, uses 128 as the incrementValue
+         */
+        return wrapBytes(bytes, step, start, 128);
+    }
+    private static ArrayList<Byte> wrapBytes (ArrayList<Byte> bytes, int step, int start, int incrementValue) {
+        /**
          *  Takes an ArrayList of bytes, and starting at start, "wraps around" the byte at every increment of step
-         *  to obfuscate the real data.  Adds 128, wrapping around positive bytes to negative values
+         *  to obfuscate the real data.  Adds incrementValue, wrapping around positive bytes to negative values
          */
 
 
@@ -54,7 +60,7 @@ public class Encrypt {
             if (j == step) {
                 // wrap, then reset
                 byte b = bytes.get(i);
-                b += 128;
+                b += incrementValue;
                 bytes.set(i, b);
                 j = 0;
             }
@@ -62,8 +68,15 @@ public class Encrypt {
 
         return bytes;
     }
-
     private static ArrayList<Byte> unwrapBytes (ArrayList<Byte> bytes, int step, int start) {
+        /**
+         *  Default implementation of unwrapBytes, with a default increment value of 128.
+         */
+
+        return unwrapBytes(bytes, step, start, 128);
+    }
+
+    private static ArrayList<Byte> unwrapBytes (ArrayList<Byte> bytes, int step, int start, int incrementValue) {
         /**
          *  Takes an ArrayList of bytes, and starting at start, unwraps the "wraps around" at every increment of step
          *  to recover the real data.
@@ -80,7 +93,7 @@ public class Encrypt {
             if (j == step) {
                 // wrap, then reset
                 byte b = bytes.get(i);
-                b -= 128;
+                b -= incrementValue;
                 bytes.set(i, b);
                 j = 0;
             }
