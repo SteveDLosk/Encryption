@@ -15,6 +15,7 @@ public class Encrypt {
         // testing
         args = new String[2];
 
+
         if (args.length != 2) {
             System.out.println("Usage: Encrypt <file name> <password>");
             System.out.println();
@@ -28,12 +29,64 @@ public class Encrypt {
         }
 
         printBytes(bytes);
-        bytes = fillWithGarbage(bytes, 1, -17);
+        bytes = wrapBytes(bytes, 2, 4);
         System.out.println();
         printBytes(bytes);
         System.out.println();
-        bytes = removeGarbage(bytes, 1, -17);
+        bytes = unwrapBytes(bytes, 2, 4);
         printBytes(bytes);
+    }
+    private static ArrayList<Byte> wrapBytes (ArrayList<Byte> bytes, int step, int start) {
+        /**
+         *  Takes an ArrayList of bytes, and starting at start, "wraps around" the byte at every increment of step
+         *  to obfuscate the real data.  Adds 128, wrapping around positive bytes to negative values
+         */
+
+
+        // instead of invalid argument, a negative start is treated as 0.
+        if (start < 0) {
+            start = 0;
+        }
+
+        // iterate through the input bytes, adding garbage every step
+        // i = position in original ArrayList, j = position in step sequence
+        for (int i = 0, j = step - start; i < bytes.size(); i++, j++) {
+            if (j == step) {
+                // wrap, then reset
+                byte b = bytes.get(i);
+                b += 128;
+                bytes.set(i, b);
+                j = 0;
+            }
+        }
+
+        return bytes;
+    }
+
+    private static ArrayList<Byte> unwrapBytes (ArrayList<Byte> bytes, int step, int start) {
+        /**
+         *  Takes an ArrayList of bytes, and starting at start, unwraps the "wraps around" at every increment of step
+         *  to recover the real data.
+         */
+
+        // instead of invalid argument, a negative start is treated as 0.
+        if (start < 0) {
+            start = 0;
+        }
+
+        // iterate through the input bytes, adding garbage every step
+        // i = position in original ArrayList, j = position in step sequence
+        for (int i = 0, j = step - start; i < bytes.size(); i++, j++) {
+            if (j == step) {
+                // wrap, then reset
+                byte b = bytes.get(i);
+                b -= 128;
+                bytes.set(i, b);
+                j = 0;
+            }
+        }
+
+        return bytes;
     }
 
     private static ArrayList<Byte> fillWithGarbage (ArrayList<Byte> bytes, int step, int start) {
